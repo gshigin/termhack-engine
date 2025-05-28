@@ -22,7 +22,7 @@ void terminal_buffer::set(size_t index, char value) noexcept {
 
 auto terminal_buffer::slice(size_t start, size_t end) const noexcept -> std::string_view {
   assert(start <= end);
-  assert(end < chars_.size());
+  assert(end <= chars_.size());
 
   return {chars_.begin() + start, chars_.begin() + end};
 }
@@ -33,13 +33,13 @@ auto terminal_buffer::view() const noexcept -> std::string_view {
 
 void terminal_buffer::replace_with_char(size_t start, size_t end, char c) noexcept {
   assert(start <= end);
-  assert(end < chars_.size());
+  assert(end <= chars_.size());
 
   std::fill(chars_.begin() + start, chars_.begin() + end, c);
 }
 
 void terminal_buffer::replace_with_string(size_t start, std::string_view str) noexcept {
-  assert(start + str.size() < chars_.size());
+  assert(start + str.size() <= chars_.size());
 
   std::copy(str.begin(), str.end(), chars_.begin() + start);
 }
