@@ -1,7 +1,7 @@
 // Copyright 2024-2025 Gleb Shigin. All rights reserved.
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
-// yafth
+// termhack
 #include "terminal_buffer.hpp"
 // stl
 #include <algorithm>
@@ -20,8 +20,7 @@ void terminal_buffer::set(size_t index, char value) noexcept {
   chars_[index] = value;
 }
 
-auto terminal_buffer::slice(size_t start,
-                            size_t end) const noexcept -> std::string_view {
+auto terminal_buffer::slice(size_t start, size_t end) const noexcept -> std::string_view {
   assert(start <= end);
   assert(end < chars_.size());
 
@@ -32,22 +31,20 @@ auto terminal_buffer::view() const noexcept -> std::string_view {
   return {chars_.begin(), chars_.end()};
 }
 
-void terminal_buffer::replace_with_char(size_t start, size_t end,
-                                        char c) noexcept {
+void terminal_buffer::replace_with_char(size_t start, size_t end, char c) noexcept {
   assert(start <= end);
   assert(end < chars_.size());
 
   std::fill(chars_.begin() + start, chars_.begin() + end, c);
 }
 
-void terminal_buffer::replace_with_string(size_t start,
-                                          std::string_view str) noexcept {
+void terminal_buffer::replace_with_string(size_t start, std::string_view str) noexcept {
   assert(start + str.size() < chars_.size());
 
   std::copy(str.begin(), str.end(), chars_.begin() + start);
 }
 
-auto terminal_buffer::raw() const noexcept -> const std::array<char, kSize> & {
+auto terminal_buffer::raw() const noexcept -> const std::array<char, kSize>& {
   return chars_;
 }
-} // namespace termhack::detail
+}  // namespace termhack::detail

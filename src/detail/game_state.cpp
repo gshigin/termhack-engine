@@ -1,7 +1,7 @@
 // Copyright 2024-2025 Gleb Shigin. All rights reserved.
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
-// yafth
+// termhack
 #include "game_state.hpp"
 // stl
 #include <cassert>
@@ -32,9 +32,15 @@ auto game_state::consume_attempt() noexcept -> bool {
   return true;
 }
 
-void game_state::reset_attempts() noexcept { attempts_left_ = 4; }
+void game_state::reset_attempts() noexcept {
+  attempts_left_ = 4;
+}
 
-auto game_state::is_game_over() const noexcept -> bool { return game_over_; }
+auto game_state::is_game_over() const noexcept -> bool {
+  return game_over_;
+}
 
-void game_state::set_game_over() noexcept { game_over_ = true; }
-} // namespace termhack::detail
+void game_state::set_game_over() noexcept {
+  game_over_ = true;
+}
+}  // namespace termhack::detail

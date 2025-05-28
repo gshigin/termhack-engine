@@ -46,10 +46,8 @@ struct xorshift32 {
   constexpr auto fork() noexcept -> xorshift32 { return xorshift32{next()}; }
 
   static constexpr auto min() noexcept -> uint32_t { return 0; }
-  static constexpr auto max() noexcept -> uint32_t {
-    return std::numeric_limits<uint32_t>::max();
-  }
+  static constexpr auto max() noexcept -> uint32_t { return std::numeric_limits<uint32_t>::max(); }
   using result_type = uint32_t;
 };
 
-} // namespace termhack::util
+}  // namespace termhack::util

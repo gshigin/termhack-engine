@@ -10,7 +10,7 @@ namespace termhack::detail {
 class game_state {
   static constexpr uint16_t kSize = 408;
 
-public:
+ public:
   [[nodiscard]] auto is_bracket_used(size_t index) const noexcept -> bool;
   void mark_bracket_used(size_t index) noexcept;
 
@@ -21,10 +21,10 @@ public:
   [[nodiscard]] auto is_game_over() const noexcept -> bool;
   void set_game_over() noexcept;
 
-private:
+ private:
   std::bitset<kSize> used_brackets_{};
   uint8_t attempts_left_ = 4;
   bool game_over_ = false;
 };
 
-} // namespace termhack::detail
+}  // namespace termhack::detail

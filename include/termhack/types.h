@@ -12,7 +12,7 @@ enum class lock_level : uint8_t { very_easy, easy, average, hard, very_hard };
 enum class input_type : uint8_t {
   look,
   click,
-  other // treated as nothing happened
+  other  // treated as nothing happened
 };
 
 struct screen_coords {
@@ -31,12 +31,12 @@ struct highlight {
 };
 
 enum class click_result {
-  error,                 // when clicking free symbol
-  dud_removed,           // when clicked brackets, removes one wrong answer
-  allowance_replenished, // when clicked brackets, restores attempts
-  entry_denied,          // when clicked wrong answer
-  lockout_in_progress,   // lock after all attemps are over
-  exact_match            // when guessed the answer
+  error,                  // when clicking free symbol
+  dud_removed,            // when clicked brackets, removes one wrong answer
+  allowance_replenished,  // when clicked brackets, restores attempts
+  entry_denied,           // when clicked wrong answer
+  lockout_in_progress,    // lock after all attemps are over
+  exact_match             // when guessed the answer
 };
 
 struct word_match {
@@ -50,10 +50,10 @@ struct click_status {
 };
 
 struct state {
-  std::string_view term_chars; // all current mutable characters
+  std::string_view term_chars;  // all current mutable characters
   std::size_t attempts_left;
   std::optional<highlight> highlighted;
-  std::optional<click_status> click_res; // if click occured
+  std::optional<click_status> click_res;  // if click occured
 };
 
 struct args {
@@ -62,4 +62,4 @@ struct args {
   std::uint64_t seed;
 };
 
-} // namespace termhack::inline types
+}  // namespace termhack::inline types
