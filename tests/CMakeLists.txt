@@ -19,7 +19,12 @@ file(GLOB_RECURSE TEST_SOURCES
 )
 
 add_executable(tests ${TEST_SOURCES})
-target_link_libraries(tests GTest::gtest_main termhack-static)
+target_link_libraries(tests PRIVATE GTest::gtest_main termhack-static)
+
+target_include_directories(tests PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/src
+)
 
 include(CTest)
 enable_testing()
