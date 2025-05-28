@@ -1,13 +1,15 @@
 // Copyright 2024-2025 Gleb Shigin. All rights reserved.
 // Use of this source code is governed by the MIT license that can be found in
 // the LICENSE file.
-// termhack
+// yafth
 #include "detail/game_state.hpp"
 #include "detail/interaction_logic.hpp"
 #include "detail/symbol_manipulator.hpp"
 #include "detail/terminal_buffer.hpp"
 #include "detail/word_repository.hpp"
 #include <termhack/engine.h>
+#include <termhack/random.h>
+#include <termhack/types.h>
 // stl
 #include <algorithm>
 #include <cassert>
@@ -15,21 +17,6 @@
 #include <utility>
 
 namespace {
-// constexpr brackets lookup
-static constexpr std::array<std::pair<char, char>, 4> brackets{
-    {{'{', '}'}, {'(', ')'}, {'<', '>'}, {'[', ']'}}};
-
-constexpr auto bracket_lookup = [](const char c) {
-  return std::find_if(begin(brackets), end(brackets),
-                      [&c](const auto &v) { return v.first == c; })
-      ->second;
-};
-
-constexpr auto is_char = [](const char c) { return c >= 'A' && c <= 'Z'; };
-constexpr auto is_open_br = [](const char c) {
-  return c == '(' || c == '[' || c == '<' || c == '{';
-};
-
 // from https://geckwiki.com/index.php?title=Hacking_Word_Count
 auto compute_word_count(termhack::lock_level lock_level_setting,
                         uint32_t player_science_skill) noexcept -> std::size_t {
