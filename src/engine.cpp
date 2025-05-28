@@ -8,8 +8,6 @@
 #include "detail/terminal_buffer.hpp"
 #include "detail/word_repository.hpp"
 #include <termhack/engine.h>
-#include <termhack/random.h>
-#include <termhack/types.h>
 // stl
 #include <algorithm>
 #include <cassert>
