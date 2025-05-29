@@ -5,7 +5,7 @@
 // termhack
 #include <termhack/types.h>
 // stl
-#include <functional>
+#include <cstdint>
 
 // fwd
 namespace termhack::detail {
@@ -15,29 +15,9 @@ class word_repository;
 }  // namespace termhack::detail
 
 namespace termhack::detail::interaction_logic {
-namespace _internal {
-using rng_fref = const std::function<uint32_t()>&;
-
-auto click_at(std::size_t index, terminal_buffer& terminal, word_repository& words, game_state& state, rng_fref gen_next) noexcept -> click_status;
-template <class URBG>
-  requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
-constexpr auto wrap_rng(URBG&& rng) noexcept;
-}  // namespace _internal
 
 auto look_at(std::size_t index, const terminal_buffer& terminal, game_state& state) noexcept -> highlight;
 
-template <class URBG>
-  requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
-auto click_at(std::size_t index, terminal_buffer& terminal, word_repository& words, game_state& state, URBG& g) noexcept -> click_status {
-  return _internal::click_at(index, terminal, words, state, _internal::wrap_rng(std::forward<URBG>(g)));
-}
+auto click_at(std::size_t index, terminal_buffer& terminal, word_repository& words, game_state& state, uint32_t rng_state) noexcept -> click_status;
 
 }  // namespace termhack::detail::interaction_logic
-
-namespace termhack::detail::interaction_logic::_internal {
-template <class URBG>
-  requires std::uniform_random_bit_generator<std::remove_reference_t<URBG>>
-constexpr auto wrap_rng(URBG&& rng) noexcept {
-  return [&]() { return rng(); };
-}
-}  // namespace termhack::detail::interaction_logic::_internal

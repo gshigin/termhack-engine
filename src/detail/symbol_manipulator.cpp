@@ -3,12 +3,17 @@
 // the LICENSE file.
 // termhack
 #include "symbol_manipulator.hpp"
+#include <algorithm>
+#include "termhack/random.h"
 #include "terminal_buffer.hpp"
 
-namespace termhack::detail::symbol_manipulator::_internal {
-auto generate_words(std::size_t length, std::size_t count, rng_fref gen_next) noexcept -> std::array<std::string, 20> {
+namespace termhack::detail::symbol_manipulator {
+auto generate_words(std::size_t length, std::size_t count, uint32_t rng_state) noexcept -> std::array<std::string, 20> {
   constexpr size_t word_array_size = 100;
   std::array<std::string, word_array_size> word_array{};
+
+  util::xorshift32 rng{rng_state};
+
   if (length == 4) {
     word_array = {"THAT", "WITH", "FROM", "WERE", "THIS", "THEY", "HAVE", "SAID", "WHAT", "WHEN", "BEEN", "THEM", "INTO", "MORE", "ONLY", "WILL", "THEN",
                   "SOME", "TIME", "SUCH", "VERY", "OVER", "YOUR", "THAN", "WELL", "DOWN", "FACE", "UPON", "LIKE", "SAME", "KNOW", "WENT", "MADE", "LONG",
@@ -114,7 +119,7 @@ auto generate_words(std::size_t length, std::size_t count, rng_fref gen_next) no
   std::array<std::string, 20> words;
   std::size_t i = 0;
   do {
-    std::string next_word = word_array[gen_next() % word_array_size];
+    std::string next_word = word_array[rng.next() % word_array_size];
     if (std::find(words.begin(), words.end(), next_word) == words.end()) {
       words[i++] = next_word;
     }
@@ -122,25 +127,29 @@ auto generate_words(std::size_t length, std::size_t count, rng_fref gen_next) no
 
   return words;
 }
-void generate_term_chars(terminal_buffer& terminal, rng_fref gen_next) noexcept {
+void generate_term_chars(terminal_buffer& terminal, uint32_t rng_state) noexcept {
   static constexpr std::array<char, 24> placeholders = {'.', ',', '!', '?', '/', '*', '+', '\'', ':', ';', '-', '_',
                                                         '%', '$', '|', '@', '{', '}', '[', ']',  '(', ')', '<', '>'};
 
+  util::xorshift32 rng{rng_state};
+
   for (size_t i = 0; i < terminal.size(); ++i) {
-    terminal.set(i, placeholders[gen_next() % placeholders.size()]);
+    terminal.set(i, placeholders[rng.next() % placeholders.size()]);
   }
 }
-auto place_words(terminal_buffer& terminal, const std::array<std::string, 20>& words, std::size_t length, std::size_t count, rng_fref gen_next) noexcept
+auto place_words(terminal_buffer& terminal, const std::array<std::string, 20>& words, std::size_t length, std::size_t count, uint32_t rng_state) noexcept
     -> std::array<uint16_t, 20> {
   std::array<uint16_t, 20> offsets{};
+
+  util::xorshift32 rng{rng_state};
 
   const std::size_t space_per_word = terminal.size() / count;
   const std::size_t possible_start = space_per_word - length;
   for (std::size_t id = 0; id < count; ++id) {
-    offsets[id] = id * space_per_word + gen_next() % possible_start;
+    offsets[id] = id * space_per_word + rng.next() % possible_start;
     terminal.replace_with_string(offsets[id], words[id]);
   }
 
   return offsets;
 }
-}  // namespace termhack::detail::symbol_manipulator::_internal
+}  // namespace termhack::detail::symbol_manipulator

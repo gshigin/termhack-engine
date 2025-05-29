@@ -46,14 +46,14 @@ namespace termhack {
 
 struct engine::impl {
   impl(lock_level lock_level_setting, uint32_t player_science_skill, uint64_t seed) noexcept : rng{static_cast<uint32_t>(util::seed(seed))} {
-    detail::symbol_manipulator::generate_term_chars(terminal, rng);
+    detail::symbol_manipulator::generate_term_chars(terminal, rng.state);
 
     const std::size_t word_length = compute_word_length(lock_level_setting, rng);
     const std::size_t word_count = compute_word_count(lock_level_setting, player_science_skill);
 
-    const std::array<std::string, 20> word_list = detail::symbol_manipulator::generate_words(word_length, word_count, rng);
+    const std::array<std::string, 20> word_list = detail::symbol_manipulator::generate_words(word_length, word_count, rng.state);
     const std::size_t answer_index = rng.next() % word_count;
-    const std::array<uint16_t, 20> offsets = detail::symbol_manipulator::place_words(terminal, word_list, word_length, word_count, rng);
+    const std::array<uint16_t, 20> offsets = detail::symbol_manipulator::place_words(terminal, word_list, word_length, word_count, rng.state);
 
     words.init(word_length, word_count, answer_index, offsets);
   }
@@ -95,7 +95,7 @@ struct engine::impl {
         break;
       case input_type::click:
         if (internal_coord.has_value()) {
-          auto click_res = detail::interaction_logic::click_at(*internal_coord, terminal, words, state, rng);
+          auto click_res = detail::interaction_logic::click_at(*internal_coord, terminal, words, state, rng.state);
           return {terminal.view(), state.attempts_left(), std::nullopt, click_res};
         }
         return {terminal.view(), state.attempts_left(), std::nullopt, std::nullopt};

@@ -4,9 +4,11 @@
 // termhack
 #include "interaction_logic.hpp"
 #include "game_state.hpp"
+#include "termhack/random.h"
 #include "terminal_buffer.hpp"
 #include "word_repository.hpp"
 // stl
+#include <algorithm>
 #include <cassert>
 #include <numeric>
 
@@ -64,13 +66,16 @@ auto termhack::detail::interaction_logic::look_at(std::size_t index, const termi
   return {index, index + 1};
 }
 
-auto termhack::detail::interaction_logic::_internal::click_at(std::size_t index,
-                                                              terminal_buffer& terminal,
-                                                              word_repository& words,
-                                                              game_state& state,
-                                                              rng_fref gen_next) noexcept -> click_status {
+auto termhack::detail::interaction_logic::click_at(std::size_t index,
+                                                   terminal_buffer& terminal,
+                                                   word_repository& words,
+                                                   game_state& state,
+                                                   uint32_t rng_state) noexcept -> click_status {
   assert(index < terminal.size());
   assert(!state.is_game_over());
+
+  util::xorshift32 rng{rng_state};
+
   const auto& [b, e] = look_at(index, terminal, state);
   std::string_view substr = terminal.slice(b, e);
   const std::string_view term = terminal.view();
@@ -109,7 +114,7 @@ auto termhack::detail::interaction_logic::_internal::click_at(std::size_t index,
         {
           if (state.attempts_left() == 4) {
             // remove dud
-            std::size_t dud_number = gen_next() % (words.words_left() - 1);
+            std::size_t dud_number = rng.next() % (words.words_left() - 1);
 
             for (auto offset : words.offsets()) {
               if (dud_number == 0) {
@@ -127,9 +132,9 @@ auto termhack::detail::interaction_logic::_internal::click_at(std::size_t index,
             return {click_result::dud_removed, {}};
           } else  // attemptsLeft != 4
           {
-            if ((gen_next() & 1) == 1) {
+            if ((rng.next() & 1) == 1) {
               // remove dud
-              std::size_t dud_number = gen_next() % (words.words_left() - 1);
+              std::size_t dud_number = rng.next() % (words.words_left() - 1);
 
               for (auto offset : words.offsets()) {
                 if (dud_number == 0) {

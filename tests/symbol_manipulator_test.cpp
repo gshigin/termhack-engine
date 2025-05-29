@@ -12,7 +12,7 @@ using termhack::util::xorshift32;
 class SymbolManipulatorTestFixture : public testing::Test {
  protected:
   terminal_buffer buffer_;
-  xorshift32 rng_{0xAABBCCDD};
+  uint32_t rng_state_ = 0xAABBCCDD;
 };
 
 TEST_F(SymbolManipulatorTestFixture, CorrectLengthAndCount) {
@@ -21,7 +21,7 @@ TEST_F(SymbolManipulatorTestFixture, CorrectLengthAndCount) {
   const std::size_t word_count = 17;
 
   // Act
-  auto words = termhack::detail::symbol_manipulator::generate_words(word_length, word_count, rng_);
+  auto words = termhack::detail::symbol_manipulator::generate_words(word_length, word_count, rng_state_);
 
   // Assert
   for (int i = 0; i < word_count; ++i) {
@@ -38,7 +38,7 @@ TEST_F(SymbolManipulatorTestFixture, GenerateChars) {
                                                         '%', '$', '|', '@', '{', '}', '[', ']',  '(', ')', '<', '>'};
 
   // Act
-  termhack::detail::symbol_manipulator::generate_term_chars(buffer_, rng_);
+  termhack::detail::symbol_manipulator::generate_term_chars(buffer_, rng_state_);
 
   // Assert
   for (int i = 0; i < buffer_.size(); ++i) {
@@ -51,11 +51,11 @@ TEST_F(SymbolManipulatorTestFixture, PlaceWords) {
   const std::size_t word_length = 9;
   const std::size_t word_count = 17;
 
-  auto words = termhack::detail::symbol_manipulator::generate_words(word_length, word_count, rng_);
-  termhack::detail::symbol_manipulator::generate_term_chars(buffer_, rng_);
+  auto words = termhack::detail::symbol_manipulator::generate_words(word_length, word_count, rng_state_);
+  termhack::detail::symbol_manipulator::generate_term_chars(buffer_, rng_state_);
 
   // Act
-  termhack::detail::symbol_manipulator::place_words(buffer_, words, word_length, word_count, rng_);
+  termhack::detail::symbol_manipulator::place_words(buffer_, words, word_length, word_count, rng_state_);
 
   auto buffer_view = buffer_.view();
 
