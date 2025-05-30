@@ -23,6 +23,7 @@ class engine {
   auto operator=(engine&&) noexcept -> engine& = delete;
 
   auto process_input(input input) noexcept -> state;
+  auto fill_terminal_buffer(char* buffer, size_t buffer_size) const noexcept -> fill_status;
 
  private:
   struct impl;

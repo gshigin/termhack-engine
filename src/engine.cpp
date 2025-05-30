@@ -58,51 +58,31 @@ struct engine::impl {
     words.init(word_length, word_count, answer_index, offsets);
   }
 
-  auto check_coords(screen_coords coords) const noexcept -> std::optional<std::size_t> {
-    auto m_x = coords.x;
-    auto m_y = coords.y;
-
-    if ((8 <= m_x && m_x <= 19) && (6 <= m_y && m_y <= 22))  // first window
-    {
-      m_x -= 8;
-      m_y -= 6;
-    } else if ((28 <= m_x && m_x <= 39) && (6 <= m_y && m_y <= 22))  // second window
-    {
-      m_x -= 28;
-      m_y -= 6;
-      m_y += 17;
-    } else {
-      return std::nullopt;
-    }
-    return 12 * m_y + m_x;
-  }
-
   auto process_input(input current_input) noexcept -> state {
-    std::optional<std::size_t> internal_coord;
-    if (current_input.coords.has_value()) {
-      internal_coord = check_coords(*current_input.coords);
-    }
     switch (current_input.type) {
-      case input_type::other:  // do nothing, return current state
-        return {terminal.view(), state.attempts_left(), {}, {}};
-        break;
-      case input_type::look:
-        if (internal_coord.has_value()) {
-          auto hl = detail::interaction_logic::look_at(*internal_coord, terminal, state);
-          return {terminal.view(), state.attempts_left(), hl, std::nullopt};
-        }
-        return {terminal.view(), state.attempts_left(), std::nullopt, {}};
-        break;
-      case input_type::click:
-        if (internal_coord.has_value()) {
-          auto click_res = detail::interaction_logic::click_at(*internal_coord, terminal, words, state, rng.state);
-          return {terminal.view(), state.attempts_left(), std::nullopt, click_res};
-        }
-        return {terminal.view(), state.attempts_left(), std::nullopt, std::nullopt};
-        break;
+      case input_type::other: {
+        return {state.attempts_left(), {}, {}};
+      }
+      case input_type::look: {
+        const auto hl = detail::interaction_logic::look_at(current_input.index, terminal, state);
+        return {state.attempts_left(), hl, std::nullopt};
+      }
+      case input_type::click: {
+        auto click_res = detail::interaction_logic::click_at(current_input.index, terminal, words, state, rng.state);
+        return {state.attempts_left(), std::nullopt, click_res};
+      }
     }
     // should not happen
-    return {terminal.view(), state.attempts_left(), std::nullopt, std::nullopt};
+    return {state.attempts_left(), std::nullopt, std::nullopt};
+  }
+
+  auto fill_terminal_buffer(char* buffer, size_t buffer_size) const noexcept -> fill_status {
+    if (buffer_size < terminal.size()) {
+      return fill_status::error;
+    }
+
+    std::copy(terminal.raw().begin(), terminal.raw().end(), buffer);
+    return fill_status::ok;
   }
 
   util::xorshift32 rng;
@@ -118,5 +98,9 @@ engine::~engine() {}
 
 auto engine::process_input(input current_input) noexcept -> state {
   return pimpl_->process_input(current_input);
+}
+
+auto engine::fill_terminal_buffer(char* buffer, size_t buffer_size) const noexcept -> fill_status {
+  return pimpl_->fill_terminal_buffer(buffer, buffer_size);
 }
 }  // namespace termhack

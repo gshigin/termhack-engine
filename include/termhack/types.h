@@ -22,12 +22,12 @@ struct screen_coords {
 
 struct input {
   input_type type;
-  std::optional<screen_coords> coords;
+  uint32_t index;
 };
 
 struct highlight {
-  std::size_t begin;
-  std::size_t end;
+  size_t begin;
+  size_t end;
 };
 
 enum class click_result {
@@ -40,8 +40,8 @@ enum class click_result {
 };
 
 struct word_match {
-  std::size_t of;
-  std::size_t from;
+  size_t of;
+  size_t from;
 };
 
 struct click_status {
@@ -50,7 +50,6 @@ struct click_status {
 };
 
 struct state {
-  std::string_view term_chars;  // all current mutable characters
   std::size_t attempts_left;
   std::optional<highlight> highlighted;
   std::optional<click_status> click_res;  // if click occured
@@ -61,5 +60,7 @@ struct args {
   lock_level lock;
   std::uint64_t seed;
 };
+
+enum class fill_status { ok, error };
 
 }  // namespace termhack::inline types
